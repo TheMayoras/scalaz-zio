@@ -172,6 +172,12 @@ object UIO {
     ZIO.forkAll_(as)
 
   /**
+   * See [[scalaz.zio.ZIO.foreach_]]
+   */
+  final def foreach_[A](as: Iterable[A])(f: A => UIO[_]): UIO[Unit] =
+    ZIO.foreach_(as)(f)
+
+  /**
    * See [[scalaz.zio.ZIO.fromFunction]]
    */
   final def fromFunction[A](f: Any => A): UIO[A] =
@@ -300,8 +306,8 @@ object UIO {
     ZIO.suspend(uio)
 
   /**
-    * [[scalaz.zio.ZIO.suspendWith]]
-    */
+   * [[scalaz.zio.ZIO.suspendWith]]
+   */
   final def suspendWith[A](io: Platform => UIO[A]): UIO[A] =
     new ZIO.SuspendWith(io)
 

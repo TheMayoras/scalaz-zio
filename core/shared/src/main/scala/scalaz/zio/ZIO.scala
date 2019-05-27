@@ -1111,6 +1111,8 @@ object ZIO extends Serializable {
     final val Access          = 14
     final val Provide         = 15
     final val SuspendWith     = 16
+    final val FiberRefNew     = 17
+    final val FiberRefModify  = 18
   }
 
   /**
@@ -1474,6 +1476,14 @@ object ZIO extends Serializable {
    * The moral equivalent of `throw` for pure code.
    */
   final def fail[E](error: E): IO[E, Nothing] = halt(Cause.fail(error))
+
+  private[zio] final class FiberRefModify[A, B](val fiberRef: FiberRef[A], val f: A => (B, A)) extends UIO[B] {
+    override def tag = Tags.FiberRefModify
+  }
+
+  private[zio] final class FiberRefNew[A](val initialValue: A) extends UIO[FiberRef[A]] {
+    override def tag = Tags.FiberRefNew
+  }
 
   private[zio] final class FlatMap[R, E, A0, A](val zio: ZIO[R, E, A0], val k: A0 => ZIO[R, E, A])
       extends ZIO[R, E, A] {
