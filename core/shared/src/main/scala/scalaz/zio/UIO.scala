@@ -1,29 +1,9 @@
 package scalaz.zio
 
 import scalaz.zio.Exit.Cause
-import scalaz.zio.internal.{ Executor, Platform }
+import scalaz.zio.internal.{Executor, Platform}
 
 object UIO {
-
-  /**
-   * See [[scalaz.zio.ZIO.interrupt]]
-   */
-  final val interrupt: UIO[Nothing] = ZIO.interrupt
-
-  /**
-   * See [[scalaz.zio.ZIO.never]]
-   */
-  final val never: UIO[Nothing] = ZIO.never
-
-  /**
-   * See [[scalaz.zio.ZIO.unit]]
-   */
-  final val unit: UIO[Unit] = ZIO.unit
-
-  /**
-   * See [[scalaz.zio.ZIO.yieldNow]]
-   */
-  final val yieldNow: UIO[Unit] = ZIO.yieldNow
 
   /**
    * See [[scalaz.zio.ZIO.absolve]]
@@ -172,10 +152,40 @@ object UIO {
     ZIO.forkAll_(as)
 
   /**
+   * See [[scalaz.zio.ZIO.foreach]]
+   */
+  final def foreach[A, B](in: Iterable[A])(f: A => UIO[B]): UIO[List[B]] =
+    ZIO.foreach(in)(f)
+
+  /**
    * See [[scalaz.zio.ZIO.foreach_]]
    */
   final def foreach_[A](as: Iterable[A])(f: A => UIO[_]): UIO[Unit] =
     ZIO.foreach_(as)(f)
+
+  /**
+   * See [[scalaz.zio.ZIO.foreachPar]]
+   */
+  final def foreachPar[A, B](as: Iterable[A])(fn: A => UIO[B]): UIO[List[B]] =
+    ZIO.foreachPar(as)(fn)
+
+  /**
+   * See [[scalaz.zio.ZIO.foreachPar_]]
+   */
+  final def foreachPar_[A](as: Iterable[A])(f: A => UIO[_]): UIO[Unit] =
+    ZIO.foreachPar_(as)(f)
+
+  /**
+   * See [[scalaz.zio.ZIO.foreachParN]]
+   */
+  final def foreachParN[A, B](n: Long)(as: Iterable[A])(fn: A => UIO[B]): UIO[List[B]] =
+    ZIO.foreachParN(n)(as)(fn)
+
+  /**
+   * See [[scalaz.zio.ZIO.foreachParN_]]
+   */
+  final def foreachParN_[A](n: Long)(as: Iterable[A])(f: A => UIO[_]): UIO[Unit] =
+    ZIO.foreachParN_(n)(as)(f)
 
   /**
    * See [[scalaz.zio.ZIO.fromFunction]]
@@ -213,6 +223,11 @@ object UIO {
   final def halt(cause: Cause[Nothing]): UIO[Nothing] = ZIO.halt(cause)
 
   /**
+   * See [[scalaz.zio.ZIO.interrupt]]
+   */
+  final val interrupt: UIO[Nothing] = ZIO.interrupt
+
+  /**
    * See [[scalaz.zio.ZIO.interruptible]]
    */
   final def interruptible[A](uio: UIO[A]): UIO[A] =
@@ -241,6 +256,11 @@ object UIO {
    */
   final def mergeAllPar[A, B](in: Iterable[UIO[A]])(zero: B)(f: (B, A) => B): UIO[B] =
     ZIO.mergeAllPar(in)(zero)(f)
+
+  /**
+   * See [[scalaz.zio.ZIO.never]]
+   */
+  final val never: UIO[Nothing] = ZIO.never
 
   /**
    * See [[scalaz.zio.ZIO.raceAll]]
@@ -312,6 +332,11 @@ object UIO {
     new ZIO.SuspendWith(io)
 
   /**
+   * See [[scalaz.zio.ZIO.unit]]
+   */
+  final val unit: UIO[Unit] = ZIO.unit
+
+  /**
    * See [[scalaz.zio.ZIO.interruptibleMask]]
    */
   final def uninterruptible[A](uio: UIO[A]): UIO[A] =
@@ -334,5 +359,10 @@ object UIO {
    */
   final def whenM(b: UIO[Boolean])(uio: UIO[_]): UIO[Unit] =
     ZIO.whenM(b)(uio)
+
+  /**
+   * See [[scalaz.zio.ZIO.yieldNow]]
+   */
+  final val yieldNow: UIO[Unit] = ZIO.yieldNow
 
 }

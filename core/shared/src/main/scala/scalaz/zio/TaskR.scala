@@ -3,31 +3,11 @@ package scalaz.zio
 import scalaz.zio.clock.Clock
 import scalaz.zio.duration.Duration
 import scalaz.zio.Exit.Cause
-import scalaz.zio.internal.{ Executor, Platform }
+import scalaz.zio.internal.{Executor, Platform}
 
 import scala.concurrent.ExecutionContext
 
 object TaskR {
-
-  /**
-   * See [[scalaz.zio.ZIO.interrupt]]
-   */
-  final val interrupt: UIO[Nothing] = ZIO.interrupt
-
-  /**
-   * See [[scalaz.zio.ZIO.never]]
-   */
-  final val never: UIO[Nothing] = ZIO.never
-
-  /**
-   * See [[scalaz.zio.ZIO.unit]]
-   */
-  final val unit: UIO[Unit] = ZIO.unit
-
-  /**
-   * See [[scalaz.zio.ZIO.yieldNow]]
-   */
-  final val yieldNow: UIO[Unit] = ZIO.yieldNow
 
   /**
    * See [[scalaz.zio.ZIO.absolve]]
@@ -64,11 +44,9 @@ object TaskR {
   /**
    * See [[scalaz.zio.ZIO.bracket]]
    */
-  final def bracket[R, A, B](
-    acquire: TaskR[R, A],
-    release: A => ZIO[R, Nothing, _],
-    use: A => TaskR[R, B]
-  ): TaskR[R, B] = ZIO.bracket(acquire, release, use)
+  final def bracket[R, A, B](acquire: TaskR[R, A],
+                             release: A => ZIO[R, Nothing, _],
+                             use:     A => TaskR[R, B]): TaskR[R, B] = ZIO.bracket(acquire, release, use)
 
   /**
    * See [[scalaz.zio.ZIO.bracketExit]]
@@ -79,11 +57,9 @@ object TaskR {
   /**
    * See [[scalaz.zio.ZIO.bracketExit]]
    */
-  final def bracketExit[R, A, B](
-    acquire: TaskR[R, A],
-    release: (A, Exit[Throwable, B]) => ZIO[R, Nothing, _],
-    use: A => TaskR[R, B]
-  ): TaskR[R, B] =
+  final def bracketExit[R, A, B](acquire: TaskR[R, A],
+                                 release: (A, Exit[Throwable, B]) => ZIO[R, Nothing, _],
+                                 use:     A => TaskR[R, B]): TaskR[R, B] =
     ZIO.bracketExit(acquire, release, use)
 
   /**
@@ -298,6 +274,11 @@ object TaskR {
   final def identity[R]: ZIO[R, Nothing, R] = ZIO.identity
 
   /**
+   * See [[scalaz.zio.ZIO.interrupt]]
+   */
+  final val interrupt: UIO[Nothing] = ZIO.interrupt
+
+  /**
    * See [[scalaz.zio.ZIO.interruptible]]
    */
   final def interruptible[R, A](taskr: TaskR[R, A]): TaskR[R, A] =
@@ -328,6 +309,11 @@ object TaskR {
     ZIO.mergeAllPar(in)(zero)(f)
 
   /**
+   * See [[scalaz.zio.ZIO.never]]
+   */
+  final val never: UIO[Nothing] = ZIO.never
+
+  /**
    * See [[scalaz.zio.ZIO.provide]]
    */
   final def provide[R, A](r: R): TaskR[R, A] => Task[A] =
@@ -354,7 +340,7 @@ object TaskR {
   /**
    * See [[scalaz.zio.ZIO.require]]
    */
-  final def require[R, A](error: Throwable): TaskR[R, Option[A]] => TaskR[R, A] =
+  final def require[R, A](error: Throwable): IO[Throwable, Option[A]] => IO[Throwable, A] =
     ZIO.require(error)
 
   /**
@@ -399,9 +385,7 @@ object TaskR {
   /**
    * See [[scalaz.zio.ZIO.superviseWith]]
    */
-  final def superviseWith[R, A](
-    taskr: TaskR[R, A]
-  )(supervisor: IndexedSeq[Fiber[_, _]] => ZIO[R, Nothing, _]): TaskR[R, A] =
+  final def superviseWith[R, A](taskr: TaskR[R, A])(supervisor: IndexedSeq[Fiber[_, _]] => ZIO[R, Nothing, _]): TaskR[R, A] =
     ZIO.superviseWith(taskr)(supervisor)
 
   /**
@@ -411,8 +395,8 @@ object TaskR {
     ZIO.suspend(taskr)
 
   /**
-    * [[scalaz.zio.ZIO.suspendWith]]
-    */
+   * [[scalaz.zio.ZIO.suspendWith]]
+   */
   final def suspendWith[A](io: Platform => UIO[A]): UIO[A] =
     new ZIO.SuspendWith(io)
 
@@ -421,6 +405,11 @@ object TaskR {
    */
   final def swap[R, A, B](implicit ev: R <:< (A, B)): TaskR[R, (B, A)] =
     ZIO.swap
+
+  /**
+   * See [[scalaz.zio.ZIO.unit]]
+   */
+  final val unit: UIO[Unit] = ZIO.unit
 
   /**
    * See [[scalaz.zio.ZIO.uninterruptible]]
@@ -433,6 +422,11 @@ object TaskR {
    */
   final def uninterruptibleMask[R, A](k: ZIO.InterruptStatusRestore => TaskR[R, A]): TaskR[R, A] =
     ZIO.uninterruptibleMask(k)
+
+  /**
+   * See [[scalaz.zio.ZIO.yieldNow]]
+   */
+  final val yieldNow: UIO[Unit] = ZIO.yieldNow
 
   /**
    * See [[scalaz.zio.ZIO._1]]

@@ -1,31 +1,11 @@
 package scalaz.zio
 
 import scalaz.zio.Exit.Cause
-import scalaz.zio.internal.{ Executor, Platform }
+import scalaz.zio.internal.{Executor, Platform}
 
 import scala.concurrent.ExecutionContext
 
 object Task {
-
-  /**
-   * See [[scalaz.zio.ZIO.interrupt]]
-   */
-  final val interrupt: UIO[Nothing] = ZIO.interrupt
-
-  /**
-   * See [[scalaz.zio.ZIO.never]]
-   */
-  final val never: UIO[Nothing] = ZIO.never
-
-  /**
-   * See [[scalaz.zio.ZIO.unit]]
-   */
-  final val unit: UIO[Unit] = ZIO.unit
-
-  /**
-   * See [[scalaz.zio.ZIO.yieldNow]]
-   */
-  final val yieldNow: UIO[Unit] = ZIO.yieldNow
 
   /**
    * See [[scalaz.zio.ZIO.absolve]]
@@ -61,11 +41,9 @@ object Task {
   /**
    * See [[scalaz.zio.ZIO.bracketExit]]
    */
-  final def bracketExit[A, B](
-    acquire: Task[A],
-    release: (A, Exit[Throwable, B]) => UIO[_],
-    use: A => Task[B]
-  ): Task[B] =
+  final def bracketExit[A, B](acquire: Task[A],
+                              release: (A, Exit[Throwable, B]) => UIO[_],
+                              use:     A => Task[B]): Task[B] =
     ZIO.bracketExit(acquire, release, use)
 
   /**
@@ -258,6 +236,11 @@ object Task {
   final def halt(cause: Cause[Throwable]): Task[Nothing] = ZIO.halt(cause)
 
   /**
+   * See [[scalaz.zio.ZIO.interrupt]]
+   */
+  final val interrupt: UIO[Nothing] = ZIO.interrupt
+
+  /**
    * See [[scalaz.zio.ZIO.interruptible]]
    */
   final def interruptible[A](task: Task[A]): Task[A] =
@@ -288,6 +271,11 @@ object Task {
     ZIO.mergeAllPar(in)(zero)(f)
 
   /**
+   * See [[scalaz.zio.ZIO.never]]
+   */
+  final val never: UIO[Nothing] = ZIO.never
+
+  /**
    * See [[scalaz.zio.ZIO.raceAll]]
    */
   final def raceAll[A](task: Task[A], ios: Iterable[Task[A]]): Task[A] =
@@ -309,7 +297,7 @@ object Task {
    * See [[scalaz.zio.ZIO.require]]
    */
   final def require[A](error: Throwable): Task[Option[A]] => Task[A] =
-    ZIO.require[Any, Throwable, A](error)
+    ZIO.require[Throwable, A](error)
 
   /**
    * See [[scalaz.zio.ZIO.reserve]]
@@ -357,10 +345,15 @@ object Task {
     ZIO.suspend(io)
 
   /**
-    * [[scalaz.zio.ZIO.suspendWith]]
-    */
+   * [[scalaz.zio.ZIO.suspendWith]]
+   */
   final def suspendWith[A](io: Platform => UIO[A]): UIO[A] =
     new ZIO.SuspendWith(io)
+
+  /**
+   * See [[scalaz.zio.ZIO.unit]]
+   */
+  final val unit: UIO[Unit] = ZIO.unit
 
   /**
    * See [[scalaz.zio.ZIO.uninterruptible]]
@@ -386,4 +379,8 @@ object Task {
   final def whenM(b: Task[Boolean])(task: Task[_]): Task[Unit] =
     ZIO.whenM(b)(task)
 
+  /**
+   * See [[scalaz.zio.ZIO.yieldNow]]
+   */
+  final val yieldNow: UIO[Unit] = ZIO.yieldNow
 }
